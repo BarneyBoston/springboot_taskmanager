@@ -40,10 +40,9 @@ git clone https://github.com/BarneyBoston/springboot_taskmanager.git
 ### Step 2: Configure databases
 
 1. Create the necessary database:
-```bash
-CREATE DATABASE IF NOT EXISTS taskmanager_directory;
-```
-2. Update the connection details in src/main/resources/application.properties:
+Instructions within the ```src/main/resources/db.migration/task_manager.sql file```
+
+3. Update the connection details in src/main/resources/application.properties:
 ```bash
 spring.datasource.url=jdbc:mysql://localhost:3306/taskmanager_directory
 spring.datasource.username=root
