@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Dashboard - Kanban</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* CSS dla layoutu Kanban - dodaj do style.css lub trzymaj w tym bloku */
+
+        .dashboard-container {
+            padding-top: 40px;
+        }
+
+        /* Glówny Grid/Layout Kanban */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* Trzy równe kolumny */
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        /* Kolumna (Lista Zadań) */
+        .kanban-column {
+            background-color: #eef1f4;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 400px;
+        }
+
+        .column-header {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #ccc;
+        }
+        .column-header.todo { border-color: #f9a825; }
+        .column-header.in-progress { border-color: #1976d2; }
+        .column-header.done { border-color: #388e3c; }
+
+        /* Karta Zadania */
+        .task-card {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-left: 5px solid; /* Na status */
+            position: relative;
+        }
+
+        .task-card.TO_DO { border-left-color: #f9a825; }
+        .task-card.IN_PROGRESS { border-left-color: #1976d2; }
+        .task-card.DONE { border-left-color: #388e3c; }
+
+        .task-card h5 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+        }
+        .task-card p {
+            font-size: 0.9em;
+            color: #666;
+            margin: 0 0 10px 0;
+        }
+
+        .task-actions-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .task-actions-row .delete-btn {
+            background: none;
+            border: none;
+            color: #d9534f;
+            cursor: pointer;
+            font-size: 0.8em;
+            padding: 0;
+        }
+
+        /* Styl dla formularza zmiany statusu */
+        .status-form {
+             display: flex;
+             gap: 5px;
+        }
+        .status-form select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 0.9em;
+        }
+        .status-form button {
+            padding: 5px 10px;
+            margin: 0;
+        }
+
+        /* Dodawanie nowego zadania - kompaktowy formularz */
+        .new-task-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .new-task-form .form-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .new-task-form input[type="text"],
+        .new-task-form input[type="date"],
+        .new-task-form select {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">Task Manager Dashboard</div>
+            <div class="nav-links">
+                <span style="margin-right: 15px;">Welcome, <strong sec:authentication="name">User</strong></span>
+                <form th:action="@{/logout}" method="post" style="display: inline;">
+                    <button type="submit" class="btn btn-secondary">Logout</button>
+                </form>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<div class="container dashboard-container">
+
+    <div th:if="${successMessage}" class="error-message" style="color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6;">
+        <p th:text="${successMessage}"></p>
+    </div>
+    <div th:if="${errorMessage}" class="error-message" style="color: #d9534f; background-color: #f2dede; border-color: #ebccd1;">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <div class="new-task-form">
+        <h3>Quick Add Task</h3>
+        <form th:action="@{/tasks/save}" th:object="${task}" method="post">
+            <div class="form-row">
+                <input type="text" th:field="*{title}" placeholder="Task Title" required style="flex-grow: 2;">
+                <select th:field="*{status}" style="width: 150px;">
+                    <option value="TO_DO">To Do</option>
+                    <option value="IN_PROGRESS">In Progress</option>
+                    <option value="DONE">Done</option>
+                </select>
+                <select th:field="*{priority}" style="width: 150px;">
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM" selected>Medium</option>
+                    <option value="HIGH">High</option>
+                </select>
+                <button type="submit" class="btn-primary" style="margin: 0;">Add Task</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="kanban-board">
+
+        <div class="kanban-column">
+            <div class="column-header todo">TO DO</div>
+            <div th:each="t : ${tasks}" th:if="${t.status == 'TO_DO'}" class="task-card TO_DO">
+                <h5 th:text="${t.title}">Task Title</h5>
+                <p th:text="'Priority: ' + ${t.priority}"></p>
+                <p th:text="${t.dueDate != null ? 'Due: ' + t.dueDate : 'No Due Date'}"></p>
+
+                <div class="task-actions-row">
+                    <form th:action="@{/tasks/update-status}" method="post" class="status-form">
+                        <input type="hidden" name="id" th:value="${t.id}" />
+                        <select name="newStatus">
+                            <option value="IN_PROGRESS">Move to In Progress</option>
+                            <option value="DONE">Move to Done</option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary">Move</button>
+                    </form>
+
+                    <a th:href="@{/tasks/delete/{id}(id=${t.id})}"
+                       class="delete-btn"
+                       onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                </div>
+            </div>
+            <div th:if="${#lists.isEmpty(tasks.?[status == 'TO_DO'])}" style="color: #777; padding: 20px;">No tasks in this column.</div>
+        </div>
+
+        <div class="kanban-column">
+            <div class="column-header in-progress">IN PROGRESS</div>
+            <div th:each="t : ${tasks}" th:if="${t.status == 'IN_PROGRESS'}" class="task-card IN_PROGRESS">
+                <h5 th:text="${t.title}">Task Title</h5>
+                <p th:text="'Priority: ' + ${t.priority}"></p>
+                <p th:text="${t.dueDate != null ? 'Due: ' + t.dueDate : 'No Due Date'}"></p>
+
+                <div class="task-actions-row">
+                    <form th:action="@{/tasks/update-status}" method="post" class="status-form">
+                        <input type="hidden" name="id" th:value="${t.id}" />
+                        <select name="newStatus">
+                            <option value="TO_DO">Move to To Do</option>
+                            <option value="DONE">Move to Done</option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary">Move</button>
+                    </form>
+
+                    <a th:href="@{/tasks/delete/{id}(id=${t.id})}"
+                       class="delete-btn"
+                       onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                </div>
+            </div>
+            <div th:if="${#lists.isEmpty(tasks.?[status == 'IN_PROGRESS'])}" style="color: #777; padding: 20px;">No tasks in this column.</div>
+        </div>
+
+        <div class="kanban-column">
+            <div class="column-header done">DONE</div>
+            <div th:each="t : ${tasks}" th:if="${t.status == 'DONE'}" class="task-card DONE">
+                <h5 th:text="${t.title}">Task Title</h5>
+                <p th:text="'Priority: ' + ${t.priority}"></p>
+                <p th:text="${t.dueDate != null ? 'Due: ' + t.dueDate : 'No Due Date'}"></p>
+
+                <div class="task-actions-row">
+                    <form th:action="@{/tasks/update-status}" method="post" class="status-form">
+                        <input type="hidden" name="id" th:value="${t.id}" />
+                        <select name="newStatus">
+                            <option value="TO_DO">Move to To Do</option>
+                            <option value="IN_PROGRESS">Move to In Progress</option>
+                        </select>
+                        <button type="submit" class="btn btn-secondary">Move</button>
+                    </form>
+
+                    <a th:href="@{/tasks/delete/{id}(id=${t.id})}"
+                       class="delete-btn"
+                       onclick="return confirm('Are you sure you want to delete this task?');">Delete</a>
+                </div>
+            </div>
+            <div th:if="${#lists.isEmpty(tasks.?[status == 'DONE'])}" style="color: #777; padding: 20px;">No tasks in this column.</div>
+        </div>
+
+    </div> </div> <footer>
+    <div class="container">
+        <p>&copy; 2024 Task Manager Project.</p>
+    </div>
+</footer>
+</body>
+</html>

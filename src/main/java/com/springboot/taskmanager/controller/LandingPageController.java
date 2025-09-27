@@ -9,9 +9,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping(ApplicationConstants.LANDING_PAGE_URL)
 public class LandingPageController {
 
-    @GetMapping()
-    public String showLandingPage(){
-
+    @GetMapping
+    public String showLandingPage() {
         return "landing-page";
     }
 }

@@ -10,4 +10,5 @@ public class ApplicationConstants {
     public static final String TASKS_PAGE_URL = "/tasks";
 
     public static final String VIEW_REGISTER = "registration";
+    public static final String REDIRECT_MESSAGE = "redirect:";
 }

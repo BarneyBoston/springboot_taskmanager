@@ -40,10 +40,18 @@ public class UserService implements UserDetailsService {
         );
     }
 
+    public User findUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found: " + username);
+        }
+        return user;
+    }
+
     public User registerNewUser(UserRegistrationDto registrationDto) {
 
         if (userRepository.findByUsername(registrationDto.getUsername()) != null) {
-            throw new UserAlreadyExistsException("Username already exists: " + registrationDto.getUsername());
+            throw new UserAlreadyExistsException("Username already exists.");
         }
 
         if (!registrationDto.getPassword().equals(registrationDto.getConfirmPassword())) {
