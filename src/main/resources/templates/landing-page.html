@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Task Manager - Own Your Day</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+
+<header>
+    <div class="container">
+        <nav class="navbar">
+            <div class="logo">Task Manager 🚀</div>
+            <div class="nav-links">
+                <a th:href="@{/login}" class="btn btn-secondary">Login</a>
+                <a th:href="@{/register}" class="btn btn-primary">Sign Up</a>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<section class="hero-section">
+    <div class="container">
+        <h1>Own Your Day with Task Manager</h1>
+        <p>A simple and effective task management application built on Spring Boot 3.</p>
+        <a th:href="@{/register}" class="btn-cta">Start Now for Free!</a>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <h2>Key Features</h2>
+        <ul class="features-list">
+            <li>
+                <h3>Full Control</h3>
+                <p>Manage your tasks, priorities, and deadlines all in one place.</p>
+            </li>
+            <li>
+                <h3>Security First</h3>
+                <p>Your data is protected by industry-standard Spring Security.</p>
+            </li>
+            <li>
+                <h3>Modern Stack</h3>
+                <p>A portfolio piece built with Spring Boot 3, JPA/Hibernate, and MySQL.</p>
+            </li>
+        </ul>
+    </div>
+</section>
+
+<section class="preview-section">
+    <div class="container">
+        <h2>Application Preview</h2>
+        <div class="preview-content">
+            <img th:src="@{/images/dashboard-preview.png}" alt="Task Manager Dashboard Screenshot" class="app-screenshot">
+            <p>A clean, user-friendly interface powered by Thymeleaf.</p>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container">
+        <p>&copy; 2024 Task Manager Project. Stack: Spring Boot 3, Spring Security, Thymeleaf, JPA/Hibernate, MySQL.</p>
+    </div>
+</footer>
+
+</body>
+</html>

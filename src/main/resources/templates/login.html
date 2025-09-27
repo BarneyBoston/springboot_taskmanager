@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Task Manager</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        /* Specific style for login */
+        .form-container {
+            max-width: 400px;
+            margin: 60px auto;
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box; /* Ważne dla paddingu */
+        }
+        .error-message {
+            color: #d9534f; /* Czerwony */
+            margin-bottom: 15px;
+            font-weight: 500;
+            padding: 10px;
+            border: 1px solid #f2dede;
+            background-color: #fcf8f2;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-container">
+    <h2>User Login</h2>
+
+    <div th:if="${param.error}" class="error-message">
+        Invalid username or password.
+    </div>
+
+    <div th:if="${param.logout}" class="error-message" style="color: #3c763d; background-color: #dff0d8; border-color: #d6e9c6;">
+        You have been successfully logged out.
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Log In</button>
+    </form>
+
+    <p style="margin-top: 20px;">
+        Don't have an account? <a th:href="@{/register}">Sign Up Here</a>
+    </p>
+</div>
+
+</body>
+</html>
