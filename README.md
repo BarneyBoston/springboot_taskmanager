@@ -34,8 +34,7 @@ Follow these steps to set up the project locally.
 ### Step 1: Clone the Repository
 
 ```bash
-git clone [YOUR_REPOSITORY_URL]
-cd task-manager
+git clone https://github.com/BarneyBoston/springboot_taskmanager.git
 ```
 
 ### Step 2: Configure databases
