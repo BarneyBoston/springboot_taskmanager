@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "user", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
+@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
 public class User {
 
     @Id
@@ -30,6 +30,7 @@ public class User {
         return id;
     }
 
+    @SuppressWarnings("unused")
     public void setId(Long id) {
         this.id = id;
     }
@@ -50,6 +51,7 @@ public class User {
         this.password = password;
     }
 
+    @SuppressWarnings("unused")
     public String getEmail() {
         return email;
     }
@@ -62,6 +64,7 @@ public class User {
         return role;
     }
 
+    @SuppressWarnings("unused")
     public void setRole(String role) {
         this.role = role;
     }
