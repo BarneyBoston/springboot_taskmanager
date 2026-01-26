@@ -66,3 +66,7 @@ The application will start on http://localhost:8080.
     * **Move/Update Status:** On any task card, use the dropdown menu to select a new status (e.g., from TO DO to IN PROGRESS) and click the **Move** button. The task will instantly appear in the correct column.
     * **Delete:** Use the "Delete" link on the task card to permanently remove the task.
 
+## 📸 Project Screenshots
+
+![Landing Page](images-readme/task_manager_1.png)
+![Tasklist Page](images-readme/task_manager_2.png)
