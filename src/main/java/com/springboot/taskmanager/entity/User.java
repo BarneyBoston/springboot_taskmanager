@@ -1,10 +1,17 @@
 package com.springboot.taskmanager.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "username"))
 public class User {
 
@@ -20,11 +27,13 @@ public class User {
 
     private String email;
 
+    @Builder.Default
     @Column(nullable = false)
     private String role = "ROLE_USER";
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Task> tasks;
+    private List<Task> tasks = new ArrayList<>();
 
     public Long getId() {
         return id;

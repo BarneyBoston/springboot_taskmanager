@@ -1,11 +1,17 @@
 package com.springboot.taskmanager.entity;
 
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "task")
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Task {
 
     @Id
@@ -22,6 +28,7 @@ public class Task {
 
     private String priority;
 
+    @Builder.Default
     @Column(nullable = false)
     private String status = "TO_DO";
 

@@ -58,14 +58,15 @@ public class UserService implements UserDetailsService {
             throw new PasswordsDoNotMatchException("Passwords do not match!");
         }
 
-        User newUser = new User();
-        newUser.setUsername(registrationDto.getUsername());
-        newUser.setEmail(registrationDto.getEmail());
-
         String encodedPassword = passwordEncoder.encode(registrationDto.getPassword());
-        newUser.setPassword(encodedPassword);
+
+        User newUser = User.builder()
+                        .username(registrationDto.getUsername())
+                        .email(registrationDto.getEmail())
+                        .password(encodedPassword)
+                        .role("ROLE_USER")
+                        .build();
 
         return userRepository.save(newUser);
     }
 }
-

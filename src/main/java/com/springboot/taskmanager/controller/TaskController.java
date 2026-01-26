@@ -37,7 +37,7 @@ public class TaskController {
 
         model.addAttribute("tasks", taskService.findAllUserTasks(user));
 
-        model.addAttribute("task", new Task());
+        model.addAttribute("task", Task.builder().build());
 
         return "task-list";
     }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.dao.DataIntegrityViolationException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -31,18 +32,22 @@ class TaskManagerRepositoryTests {
 
     @Test
     void taskRepositorySaveAndFindByUser() {
-        // create and save a user
-        User user = new User();
-        user.setUsername("testuser");
-        user.setPassword("password");
-        user.setEmail("test@example.com");
+        User user = User.builder()
+                .username("testuser")
+                .password("password")
+                .email("test@example.com")
+                .role("ROLE_USER")
+                .build();
         user = userRepository.save(user);
 
-        // create and save a task for that user
-        Task task = new Task();
-        task.setTitle("Test Task");
-        task.setDescription("A task for testing");
-        task.setUser(user);
+        Task task = Task.builder()
+                .title("Test Task")
+                .description("A task for testing")
+                .dueDate(LocalDate.now().plusDays(1))
+                .priority("HIGH")
+                .status("TO_DO")
+                .user(user)
+                .build();
 
         Task saved = taskRepository.save(task);
         assertThat(saved.getId()).isNotNull();
@@ -60,9 +65,12 @@ class TaskManagerRepositoryTests {
 
     @Test
     void taskRepositoryFindByUserWhenNoTasks() {
-        User user = new User();
-        user.setUsername("emptyuser");
-        user.setPassword("password");
+        User user = User.builder()
+                .username("emptyuser")
+                .password("password")
+                .email("empty@example.com")
+                .role("ROLE_USER")
+                .build();
         user = userRepository.save(user);
 
         List<Task> tasks = taskRepository.findByUser(user);
@@ -71,19 +79,30 @@ class TaskManagerRepositoryTests {
 
     @Test
     void taskRepositoryFindByIdAndUserWithDifferentUserReturnsNull() {
-        User user1 = new User();
-        user1.setUsername("user1");
-        user1.setPassword("pw");
+        User user1 = User.builder()
+                .username("user1")
+                .password("pw")
+                .email("u1@example.com")
+                .role("ROLE_USER")
+                .build();
         user1 = userRepository.save(user1);
 
-        Task task = new Task();
-        task.setTitle("User1 Task");
-        task.setUser(user1);
+        Task task = Task.builder()
+                .title("User1 Task")
+                .description("desc")
+                .dueDate(LocalDate.now())
+                .priority("LOW")
+                .status("TO_DO")
+                .user(user1)
+                .build();
         Task saved = taskRepository.save(task);
 
-        User user2 = new User();
-        user2.setUsername("user2");
-        user2.setPassword("pw");
+        User user2 = User.builder()
+                .username("user2")
+                .password("pw")
+                .email("u2@example.com")
+                .role("ROLE_USER")
+                .build();
         user2 = userRepository.save(user2);
 
         Task found = taskRepository.findByIdAndUser(saved.getId(), user2);
@@ -92,9 +111,12 @@ class TaskManagerRepositoryTests {
 
     @Test
     void userRepositoryFindByUsername() {
-        User user = new User();
-        user.setUsername("findme");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("findme")
+                .password("pw")
+                .email("findme@example.com")
+                .role("ROLE_USER")
+                .build();
         userRepository.save(user);
 
         User found = userRepository.findByUsername("findme");
@@ -110,36 +132,55 @@ class TaskManagerRepositoryTests {
 
     @Test
     void taskRepositorySaveWithoutTitleShouldFail() {
-        User user = new User();
-        user.setUsername("withuser");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("withuser")
+                .password("pw")
+                .email("with@example.com")
+                .role("ROLE_USER")
+                .build();
         user = userRepository.save(user);
 
-        Task task = new Task();
-        // no title set -> should violate not-null constraint
-        task.setUser(user);
+        Task task = Task.builder()
+                .description("no title")
+                .dueDate(LocalDate.now())
+                .priority("MEDIUM")
+                .status("TO_DO")
+                .user(user)
+                .build();
 
         assertThrows(DataIntegrityViolationException.class, () -> taskRepository.saveAndFlush(task));
     }
 
     @Test
     void taskRepositorySaveWithoutUserShouldFail() {
-        Task task = new Task();
-        task.setTitle("NoUser");
+        Task task = Task.builder()
+                .title("NoUser")
+                .description("no user")
+                .dueDate(LocalDate.now())
+                .priority("LOW")
+                .status("TO_DO")
+                .build();
 
         assertThrows(DataIntegrityViolationException.class, () -> taskRepository.saveAndFlush(task));
     }
 
     @Test
     void userRepositoryCascadeSaveTasksWhenSavingUser() {
-        User user = new User();
-        user.setUsername("cascadeUser");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("cascadeUser")
+                .password("pw")
+                .email("cascade@example.com")
+                .role("ROLE_USER")
+                .build();
 
-        Task task = new Task();
-        task.setTitle("Cascade Task");
-        task.setDescription("Created via cascade");
-        task.setUser(user);
+        Task task = Task.builder()
+                .title("Cascade Task")
+                .description("Created via cascade")
+                .dueDate(LocalDate.now())
+                .priority("MEDIUM")
+                .status("TO_DO")
+                .user(user)
+                .build();
 
         List<Task> list = new ArrayList<>();
         list.add(task);
@@ -155,15 +196,22 @@ class TaskManagerRepositoryTests {
 
     @Test
     void taskRepositoryUpdateTask() {
-        User user = new User();
-        user.setUsername("upUser");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("upUser")
+                .password("pw")
+                .email("up@example.com")
+                .role("ROLE_USER")
+                .build();
         user = userRepository.save(user);
 
-        Task task = new Task();
-        task.setTitle("Old Title");
-        task.setStatus("TO_DO");
-        task.setUser(user);
+        Task task = Task.builder()
+                .title("Old Title")
+                .status("TO_DO")
+                .description("old")
+                .dueDate(LocalDate.now())
+                .priority("LOW")
+                .user(user)
+                .build();
         Task saved = taskRepository.save(task);
 
         saved.setTitle("New Title");
@@ -178,14 +226,22 @@ class TaskManagerRepositoryTests {
 
     @Test
     void taskRepositoryDeleteTaskById() {
-        User user = new User();
-        user.setUsername("delUser");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("delUser")
+                .password("pw")
+                .email("del@example.com")
+                .role("ROLE_USER")
+                .build();
         user = userRepository.save(user);
 
-        Task task = new Task();
-        task.setTitle("ToDelete");
-        task.setUser(user);
+        Task task = Task.builder()
+                .title("ToDelete")
+                .description("delete me")
+                .dueDate(LocalDate.now())
+                .priority("LOW")
+                .status("TO_DO")
+                .user(user)
+                .build();
         Task saved = taskRepository.save(task);
 
         taskRepository.deleteById(saved.getId());
@@ -198,13 +254,21 @@ class TaskManagerRepositoryTests {
 
     @Test
     void userRepositoryDeleteUserCascadesTasks() {
-        User user = new User();
-        user.setUsername("userToDelete");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("userToDelete")
+                .password("pw")
+                .email("delete@example.com")
+                .role("ROLE_USER")
+                .build();
 
-        Task task = new Task();
-        task.setTitle("TaskToCascadeDelete");
-        task.setUser(user);
+        Task task = Task.builder()
+                .title("TaskToCascadeDelete")
+                .description("cascade")
+                .dueDate(LocalDate.now())
+                .priority("MEDIUM")
+                .status("TO_DO")
+                .user(user)
+                .build();
 
         List<Task> list = new ArrayList<>();
         list.add(task);
@@ -221,13 +285,21 @@ class TaskManagerRepositoryTests {
 
     @Test
     void userRepositoryOrphanRemovalWhenRemovingFromList() {
-        User user = new User();
-        user.setUsername("orphanUser");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("orphanUser")
+                .password("pw")
+                .email("orph@example.com")
+                .role("ROLE_USER")
+                .build();
 
-        Task task = new Task();
-        task.setTitle("OrphanTask");
-        task.setUser(user);
+        Task task = Task.builder()
+                .title("OrphanTask")
+                .description("orphan")
+                .dueDate(LocalDate.now())
+                .priority("LOW")
+                .status("TO_DO")
+                .user(user)
+                .build();
 
         List<Task> list = new ArrayList<>();
         list.add(task);
@@ -246,14 +318,20 @@ class TaskManagerRepositoryTests {
 
     @Test
     void userRepositoryDuplicateUsernameThrows() {
-        User user1 = new User();
-        user1.setUsername("duplicate");
-        user1.setPassword("pw");
+        User user1 = User.builder()
+                .username("duplicate")
+                .password("pw")
+                .email("dup@example.com")
+                .role("ROLE_USER")
+                .build();
         userRepository.saveAndFlush(user1);
 
-        User user2 = new User();
-        user2.setUsername("duplicate");
-        user2.setPassword("pw");
+        User user2 = User.builder()
+                .username("duplicate")
+                .password("pw")
+                .email("dup2@example.com")
+                .role("ROLE_USER")
+                .build();
 
         assertThrows(DataIntegrityViolationException.class, () -> userRepository.saveAndFlush(user2));
     }
@@ -262,9 +340,12 @@ class TaskManagerRepositoryTests {
     void userRepositoryHelpers() {
         long initial = userRepository.count();
 
-        User user = new User();
-        user.setUsername("helperUser");
-        user.setPassword("pw");
+        User user = User.builder()
+                .username("helperUser")
+                .password("pw")
+                .email("help@example.com")
+                .role("ROLE_USER")
+                .build();
         user = userRepository.save(user);
 
         assertThat(userRepository.count()).isEqualTo(initial + 1);
