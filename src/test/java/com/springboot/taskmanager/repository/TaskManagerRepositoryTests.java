@@ -358,4 +358,38 @@ class TaskManagerRepositoryTests {
         userRepository.deleteById(user.getId());
         assertThat(userRepository.existsById(user.getId())).isFalse();
     }
+
+    @Test
+    void userRepositoryGetAll() {
+        long initial = userRepository.count();
+
+        User user1 = User.builder()
+                .username("getall1")
+                .password("pw")
+                .email("getall1@example.com")
+                .role("ROLE_USER")
+                .build();
+        userRepository.save(user1);
+
+        User user2 = User.builder()
+                .username("getall2")
+                .password("pw")
+                .email("getall2@example.com")
+                .role("ROLE_USER")
+                .build();
+        userRepository.save(user2);
+
+        User user3 = User.builder()
+                .username("getall3")
+                .password("pw")
+                .email("getall3@example.com")
+                .role("ROLE_USER")
+                .build();
+        userRepository.save(user3);
+
+        assertThat(userRepository.count()).isEqualTo(initial + 3);
+
+        List<User> all = userRepository.findAll();
+        assertThat(all).isNotEmpty();
+    }
 }
