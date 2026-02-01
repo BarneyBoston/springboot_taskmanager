@@ -1,5 +1,8 @@
 package com.springboot.taskmanager.dto;
 
+import lombok.Builder;
+
+@Builder
 public class UserRegistrationDto {
 
     private String username;
