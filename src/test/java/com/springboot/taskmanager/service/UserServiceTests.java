@@ -2,6 +2,8 @@ package com.springboot.taskmanager.service;
 
 import com.springboot.taskmanager.dto.UserRegistrationDto;
 import com.springboot.taskmanager.entity.User;
+import com.springboot.taskmanager.exceptions.PasswordsDoNotMatchException;
+import com.springboot.taskmanager.exceptions.UserAlreadyExistsException;
 import com.springboot.taskmanager.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,10 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTests {
@@ -80,5 +82,50 @@ class UserServiceTests {
 
         assertEquals(savedUser.getUsername(), registeredNewUser.getUsername());
         assertEquals(savedUser.getPassword(), registeredNewUser.getPassword());
+    }
+
+    @Test
+    void userServiceRegisterNewUserUserAlreadyExistsException() {
+        //given
+        UserRegistrationDto registrationDto = UserRegistrationDto.builder()
+                .username("userDtoToRegister")
+                .password("pw")
+                .confirmPassword("pw")
+                .email("registeredDto@example.com")
+                .build();
+        //when
+        // repository should report username not existing
+        when(userRepository.findByUsername(registrationDto.getUsername())).thenReturn(new User());
+
+
+        //then
+        assertThatThrownBy(() -> userService.registerNewUser(registrationDto))
+                .isInstanceOf(UserAlreadyExistsException.class)
+                .hasMessageContaining("Username already exists.");
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void userServiceRegisterNewUserPasswordDoesNotMatchException() {
+        //given
+        UserRegistrationDto registrationDto = UserRegistrationDto.builder()
+                .username("userDtoToRegister")
+                .password("pw")
+                .confirmPassword("differentPw")
+                .email("registeredDto@example.com")
+                .build();
+        //when
+        // first condition must pass
+        when(userRepository.findByUsername(anyString())).thenReturn(null);
+
+
+        //then
+        assertThatThrownBy(() -> userService.registerNewUser(registrationDto))
+                .isInstanceOf(PasswordsDoNotMatchException.class)
+                .hasMessageContaining("Passwords do not match!");
+
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(userRepository, never()).save(any());
     }
 }
